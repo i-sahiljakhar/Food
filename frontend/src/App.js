@@ -8,6 +8,7 @@ import Footer from "./components/Footer/Footer";
 import LoginPopup from "./components/LoginPopup/LoginPopup";
 import Verify from "./pages/Verify/Verify";
 import MyOrder from "./pages/Myorders/MyOrder";
+import VerifyOTP from "./pages/VerifyOTP/VerifyOTP";
 function App() {
   const [showLogin, setShowLogin] = useState(false);
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/Order" element={<PlaceOrder />} />
           <Route path="/verify" element={<Verify/>}/>
           <Route path="/myorders" element={<MyOrder/>}/>
+         <Route path="/verify-otp" element={<VerifyOTP/>}/>
         </Routes>
       </div>
       <Footer />

@@ -1,17 +1,23 @@
+
+
 import React, { useState, useContext } from "react";
 import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
+import { useNavigate } from "react-router-dom"; // ✅ Import for navigation
 import axios from "axios";
+
 function LoginPopup({ setShowLogin }) {
   const { url, setToken } = useContext(StoreContext);
-
+  const navigate = useNavigate(); // ✅ For OTP page navigation
+  
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
     name: "",
     email: "",
     password: "",
   });
+  const [loading, setLoading] = useState(false); // ✅ Loading state
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
@@ -21,29 +27,69 @@ function LoginPopup({ setShowLogin }) {
 
   const onLogin = async (event) => {
     event.preventDefault();
-    let newUrl = url;
-    if (currState === "Login") {
-      newUrl += "/api/user/login";
-    } else {
-      newUrl += "/api/user/register";
-    }
-
+    setLoading(true);
+    
+    // ✅ Trim data before sending
+    const cleanData = {
+      name: data.name?.trim(),
+      email: data.email?.trim().toLowerCase(),
+      password: data.password?.trim()
+    };
+    
     try {
-      const response = await axios.post(newUrl, data);
+      console.log("📤 Sending data:", cleanData);
+      
+      const response = await axios.post(
+        `${url}/api/user/${currState === "Login" ? "login" : "register"}`,
+        cleanData
+      );
+
+      console.log("📥 Response:", response.data);
 
       if (response.data.success) {
-        setToken(response.data.token);
-        localStorage.setItem("token", response.data.token);
-        alert(response.data.message || "Login successful!");
-        setShowLogin(false);
+        if (response.data.token) {
+          // ✅ Normal login/register with token
+          setToken(response.data.token);
+          localStorage.setItem("token", response.data.token);
+          alert(response.data.message || `${currState} successful!`);
+          setShowLogin(false);
+        } else if (response.data.requiresOTP) {
+          // ✅ Navigate to OTP verification page
+          setShowLogin(false);
+          navigate('/verify-otp', { 
+            state: { 
+              email: response.data.email || cleanData.email 
+            } 
+          });
+        }
       } else {
         alert(response.data.message || "Something went wrong!");
       }
     } catch (error) {
-      console.error("Login error:", error);
-      alert("Network error. Please check your backend connection.");
+      console.error("❌ Full error:", error);
+      
+      if (error.response) {
+        const errorData = error.response.data;
+        
+        // ✅ Check if OTP verification required
+        if (errorData.requiresOTP) {
+          setShowLogin(false);
+          navigate('/verify-otp', { 
+            state: { email: errorData.email || cleanData.email } 
+          });
+        } else {
+          alert(`Error ${error.response.status}: ${errorData.message || 'Bad Request'}`);
+        }
+      } else if (error.request) {
+        alert("No response from server. Check if backend is running on port 5000.");
+      } else {
+        alert(`Error: ${error.message}`);
+      }
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <div className="login-popup">
       <form onSubmit={onLogin} className="login-popup-container">
@@ -52,13 +98,12 @@ function LoginPopup({ setShowLogin }) {
           <img
             onClick={() => setShowLogin(false)}
             src={assets.cross_icon}
-            alt=""
+            alt="close"
           />
         </div>
+        
         <div className="login-popup-inputs">
-          {currState === "Login" ? (
-            <></>
-          ) : (
+          {currState === "Sign Up" && (
             <input
               name="name"
               onChange={onChangeHandler}
@@ -77,32 +122,36 @@ function LoginPopup({ setShowLogin }) {
             placeholder="Your email"
             required
           />
+          
           <input
             name="password"
             onChange={onChangeHandler}
             value={data.password}
+            minLength={8}
             type="password"
-            placeholder="password"
+            placeholder="Password (min 8 characters)"
             required
           />
         </div>
-        <button type="submit">
-          {currState === "Sing Up" ? "Create Account" : "Login"}
+        
+        <button type="submit" disabled={loading}>
+          {loading ? "Please wait..." : (currState === "Sign Up" ? "Create Account" : "Login")}
         </button>
+        
         <div className="login-popup-condition">
           <input type="checkbox" required />
-          <p> By continuing a agree to the terms of use & privacy policy</p>
+          <p>By continuing you agree to the terms of use & privacy policy</p>
         </div>
+        
         {currState === "Login" ? (
           <p>
-            create a new Account?{" "}
-            <span onClick={() => setCurrState("Sign Up")}>Click hare</span>
+            Create a new account?{" "}
+            <span onClick={() => setCurrState("Sign Up")}>Click here</span>
           </p>
         ) : (
           <p>
-            {" "}
-            Already have an account?
-            <span onClick={() => setCurrState("")}>Login here</span>
+            Already have an account?{" "}
+            <span onClick={() => setCurrState("Login")}>Login here</span>
           </p>
         )}
       </form>
@@ -111,4 +160,3 @@ function LoginPopup({ setShowLogin }) {
 }
 
 export default LoginPopup;
-
