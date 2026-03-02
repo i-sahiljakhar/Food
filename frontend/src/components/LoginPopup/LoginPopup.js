@@ -10,6 +10,15 @@ import axios from "axios";
 function LoginPopup({ setShowLogin }) {
   const { url, setToken } = useContext(StoreContext);
   const navigate = useNavigate(); // ✅ For OTP page navigation
+
+// Debug line add karo
+console.log("🔍 API URL:", url + "/api/user/login");
+
+const response = await axios.post(
+  `${url}/api/user/login`,  // ✅ POST request
+  cleanData
+);
+
   
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
