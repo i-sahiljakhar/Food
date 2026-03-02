@@ -1,24 +1,11 @@
-
-
 import React, { useState, useContext } from "react";
 import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
-import { useNavigate } from "react-router-dom"; // ✅ Import for navigation
 import axios from "axios";
 
 function LoginPopup({ setShowLogin }) {
   const { url, setToken } = useContext(StoreContext);
-  const navigate = useNavigate(); // ✅ For OTP page navigation
-
-// Debug line add karo
-console.log("🔍 API URL:", url + "/api/user/login");
-
-const response = await axios.post(
-  `${url}/api/user/login`,  // ✅ POST request
-  cleanData
-);
-
   
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
@@ -26,7 +13,7 @@ const response = await axios.post(
     email: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false); // ✅ Loading state
+  const [loading, setLoading] = useState(false);
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
@@ -34,11 +21,11 @@ const response = await axios.post(
     setData((data) => ({ ...data, [name]: value }));
   };
 
+  // ✅ IMPORTANT: onLogin function ko async banana hoga
   const onLogin = async (event) => {
     event.preventDefault();
     setLoading(true);
     
-    // ✅ Trim data before sending
     const cleanData = {
       name: data.name?.trim(),
       email: data.email?.trim().toLowerCase(),
@@ -48,57 +35,29 @@ const response = await axios.post(
     try {
       console.log("📤 Sending data:", cleanData);
       
+      // ✅ await sirf async function ke andar use karo
       const response = await axios.post(
         `${url}/api/user/${currState === "Login" ? "login" : "register"}`,
         cleanData
       );
 
-      console.log("📥 Response:", response.data);
-
       if (response.data.success) {
-        if (response.data.token) {
-          // ✅ Normal login/register with token
-          setToken(response.data.token);
-          localStorage.setItem("token", response.data.token);
-          alert(response.data.message || `${currState} successful!`);
-          setShowLogin(false);
-        } else if (response.data.requiresOTP) {
-          // ✅ Navigate to OTP verification page
-          setShowLogin(false);
-          navigate('/verify-otp', { 
-            state: { 
-              email: response.data.email || cleanData.email 
-            } 
-          });
-        }
+        setToken(response.data.token);
+        localStorage.setItem("token", response.data.token);
+        alert(response.data.message || `${currState} successful!`);
+        setShowLogin(false);
       } else {
         alert(response.data.message || "Something went wrong!");
       }
     } catch (error) {
-      console.error("❌ Full error:", error);
-      
-      if (error.response) {
-        const errorData = error.response.data;
-        
-        // ✅ Check if OTP verification required
-        if (errorData.requiresOTP) {
-          setShowLogin(false);
-          navigate('/verify-otp', { 
-            state: { email: errorData.email || cleanData.email } 
-          });
-        } else {
-          alert(`Error ${error.response.status}: ${errorData.message || 'Bad Request'}`);
-        }
-      } else if (error.request) {
-        alert("No response from server. Check if backend is running on port 5000.");
-      } else {
-        alert(`Error: ${error.message}`);
-      }
+      console.error("❌ Error:", error);
+      alert(error.response?.data?.message || "Server error");
     } finally {
       setLoading(false);
     }
   };
 
+  // ✅ Rest of the component remains same
   return (
     <div className="login-popup">
       <form onSubmit={onLogin} className="login-popup-container">
@@ -138,7 +97,7 @@ const response = await axios.post(
             value={data.password}
             minLength={8}
             type="password"
-            placeholder="Password (min 8 characters)"
+            placeholder="Password"
             required
           />
         </div>
