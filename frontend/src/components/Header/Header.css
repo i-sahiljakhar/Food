@@ -1,7 +1,7 @@
-.header{
+/* .header{
     height: 34vw;
     margin: 30px auto;
-    background: url("D:\sho\frontend\public\header_img.png") no-repeat;
+    background: url("../../assets/header_img.png") no-repeat;
     background-size: contain;
     position: relative;
 
@@ -52,4 +52,85 @@ animation: fadeIn 3s;
         padding: 2vw 4vw;
     }
 
+} */
+
+.header{
+    height: 34vw;
+    margin: 30px auto;
+   background: url("../../assets/header_img.png") no-repeat;
+    background-size: contain;  /* ✅ background-image hata di, sirf size rakha */
+    position: relative;
+    background-repeat: no-repeat;  /* ✅ image repeat na ho */
+    background-position: center;    /* ✅ image center mein rahe */
+}
+
+.header-contents{
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 1.5vw;
+    max-width: 50%;
+    bottom: 10%;
+    left: 6vw;
+    animation: fadeIn 3s;
+}
+
+.header-contents h2{
+    font-weight: 500;
+    color: white;
+    font-size: max(4.5vw, 22px);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);  /* ✅ text readable ke liye */
+}
+
+.header-contents p{
+    color: white;
+    font-size: 1vw;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);  /* ✅ text readable ke liye */
+}
+
+.header-contents button{
+    border: none;
+    color: #747474;
+    font-weight: 500;
+    padding: 1vw 2.3vw;
+    background-color: white;
+    font-size: max(1vw, 13px);
+    border-radius: 50px;
+    cursor: pointer;  /* ✅ button cursor */
+    transition: 0.3s;  /* ✅ smooth hover effect */
+}
+
+.header-contents button:hover {
+    background-color: #f0f0f0;  /* ✅ hover effect */
+    transform: scale(1.05);      /* ✅ thoda zoom effect */
+}
+
+/* FadeIn Animation */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Media Queries */
+@media(max-width:1050px){
+    .header-contents{
+        max-width: 45%;
+    }
+}
+
+@media(max-width:750px){
+    .header-contents{
+        max-width: 65%;
+    }
+    .header-contents p{
+        display: none;
+    }
+    .header-contents button{
+        padding: 2vw 4vw;
+    }
 }

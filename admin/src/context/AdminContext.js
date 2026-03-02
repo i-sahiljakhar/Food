@@ -11,13 +11,11 @@ const AdminContextProvider = ({ children }) => {
 
     const url = "http://localhost:5000";
 
-    // Admin Login - Gets REAL JWT from backend
     const adminLogin = async (email, password) => {
         setLoading(true);
         try {
             console.log("📢 Attempting admin login with:", email);
             
-            // Call backend for real token
             const response = await axios.post(url + "/api/admin/login", {
                 email,
                 password
@@ -28,7 +26,6 @@ const AdminContextProvider = ({ children }) => {
             if (response.data.success) {
                 const token = response.data.token;
                 
-                // Verify it's a real JWT (3 parts)
                 const isJWT = token.split('.').length === 3;
                 console.log("📢 Is JWT format?", isJWT);
                 console.log("📢 Token preview:", token.substring(0, 30) + "...");
@@ -37,13 +34,11 @@ const AdminContextProvider = ({ children }) => {
                     throw new Error("❌ Backend did not return valid JWT");
                 }
 
-                // Save the REAL token
                 setAdminToken(token);
                 localStorage.setItem("adminToken", token);
                 
                 console.log("✅ Real JWT saved to localStorage");
                 
-                // Navigate to orders
                 navigate("/orders");
                 return { success: true };
             } else {
@@ -63,7 +58,6 @@ const AdminContextProvider = ({ children }) => {
         }
     };
 
-    // Check for existing token on load
     useEffect(() => {
         const checkExistingToken = () => {
             const token = localStorage.getItem("adminToken");
@@ -75,7 +69,6 @@ const AdminContextProvider = ({ children }) => {
 
             console.log("📢 Found token in localStorage:", token.substring(0, 30) + "...");
             
-            // Check if it's a real JWT (has 3 parts)
             const parts = token.split('.');
             console.log("📢 Token parts:", parts.length);
             
@@ -90,9 +83,8 @@ const AdminContextProvider = ({ children }) => {
         };
 
         checkExistingToken();
-    }, []); // Empty dependency array = run once on mount
+    }, []);
 
-    // Admin logout
     const adminLogout = () => {
         setAdminToken("");
         localStorage.removeItem("adminToken");

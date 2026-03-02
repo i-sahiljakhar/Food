@@ -4,12 +4,12 @@
 import foodModel from "../models/foodModel.js";
 import fs from "fs";
 
-// Add food item
+
 const addFood = async (req, res) => {
     try {
         const { name, description, price, category } = req.body;
         
-        // Validation
+      
         if (!name || !description || !price || !category || !req.file) {
             return res.status(400).json({
                 success: false,
@@ -42,7 +42,7 @@ const addFood = async (req, res) => {
     }
 };
 
-// Get all food items
+
 const listFood = async (req, res) => {
     try {
         const { category, search, page = 1, limit = 10 } = req.query;
@@ -83,7 +83,7 @@ const listFood = async (req, res) => {
     }
 };
 
-// Remove food item
+
 const removeFood = async (req, res) => {
     try {
         const { id } = req.body;
@@ -96,7 +96,7 @@ const removeFood = async (req, res) => {
             });
         }
 
-        // Delete image file
+     
         fs.unlink(`uploads/${food.image}`, (err) => {
             if (err) console.error("Error deleting image:", err);
         });
@@ -116,7 +116,7 @@ const removeFood = async (req, res) => {
     }
 };
 
-// Update food item
+
 const updateFood = async (req, res) => {
     try {
         const { id, name, description, price, category } = req.body;
@@ -129,7 +129,7 @@ const updateFood = async (req, res) => {
         };
 
         if (req.file) {
-            // Delete old image
+         
             const oldFood = await foodModel.findById(id);
             if (oldFood && oldFood.image) {
                 fs.unlink(`uploads/${oldFood.image}`, (err) => {

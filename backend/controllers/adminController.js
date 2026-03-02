@@ -7,8 +7,6 @@ const adminLogin = async (req, res) => {
         console.log("🔵 Backend: Admin login attempt:", email);
 
         if (email === "Sahiljakhar015@gmail.com" && password === "Jakhar@123") {
-            
-           
             const token = jwt.sign(
                 { 
                     id: "admin",
@@ -24,18 +22,18 @@ const adminLogin = async (req, res) => {
 
             return res.json({
                 success: true,
-                token: token, 
+                token: token,
                 message: "Admin login successful"
             });
         } else {
-            console.log(" Backend: Invalid credentials");
+            console.log("🔴 Backend: Invalid credentials");
             return res.status(401).json({
                 success: false,
                 message: "Invalid email or password"
             });
         }
     } catch (error) {
-        console.error(" Backend error:", error);
+        console.error("🔴 Backend error:", error);
         res.status(500).json({
             success: false,
             message: "Server error"

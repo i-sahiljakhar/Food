@@ -1,38 +1,26 @@
-.verify{
-    min-height: 60vh;
-    display: grid;
-
-}
-.verify .spinner{
-    width: 100px;
-    height: 100px;
-    place-self: center;
-    border:5px solid #bdbdbd ;
-    border-top-color: tomato;
-    border-radius: 50%;
-    animation: rotate 1s infinite;
-}
-@keyframes rotate {
-    100%{
-        transform: rotate(360deg);
-    }
-}
 .verify {
     min-height: 60vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 20px;
 }
 
-.verify .spinner {
-    width: 60px;
-    height: 60px;
+.verify-container {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
     border: 5px solid #f3f3f3;
     border-top: 5px solid #ff6b6b;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
 }
 
 @keyframes spin {
@@ -40,8 +28,8 @@
     100% { transform: rotate(360deg); }
 }
 
-.verify p {
+.small {
+    font-size: 14px;
     color: #666;
-    font-size: 18px;
-    font-weight: 500;
+    margin-top: 10px;
 }
