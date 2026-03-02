@@ -9,7 +9,9 @@ const StoreContextProvider = (props) => {
   const [food_list, setFoodList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const url = "http://localhost:5000";
+ const url = process.env.NODE_ENV === 'development' 
+    ? "http://localhost:5000" 
+    : "https://your-backend.onrender.com"; 
 
   
   const addToCart = async (itemId) => {
