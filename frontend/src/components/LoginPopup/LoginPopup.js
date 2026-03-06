@@ -25,12 +25,13 @@ function LoginPopup({ setShowLogin }) {
   };
 
   const onLogin = async (event) => {
+
     event.preventDefault();
     setLoading(true);
 
     try {
 
-      const endpoint = currState === "Login" ? "login" : "register";
+      let endpoint = currState === "Login" ? "login" : "register";
 
       const response = await axios.post(
         `${url}/api/user/${endpoint}`,
@@ -44,7 +45,9 @@ function LoginPopup({ setShowLogin }) {
         setShowLogin(false);
 
       } else {
+
         alert(response.data.message);
+
       }
 
     } catch (error) {
@@ -113,25 +116,19 @@ function LoginPopup({ setShowLogin }) {
 
           <input type="checkbox" required />
 
-          <p>
-            By continuing you agree to the terms of use & privacy policy
-          </p>
+          <p>By continuing you agree to the terms of use & privacy policy</p>
 
         </div>
 
         {currState === "Login" ? (
           <p>
             Create a new account?{" "}
-            <span onClick={() => setCurrState("Sign Up")}>
-              Click here
-            </span>
+            <span onClick={() => setCurrState("Sign Up")}>Click here</span>
           </p>
         ) : (
           <p>
             Already have an account?{" "}
-            <span onClick={() => setCurrState("Login")}>
-              Login here
-            </span>
+            <span onClick={() => setCurrState("Login")}>Login here</span>
           </p>
         )}
 
