@@ -24,7 +24,7 @@ app.use(cors({
     origin: [
         'http://localhost:3000',
         'https://food-frontend.vercel.app', // आपका Vercel URL
-        'https://your-backend.onrender.com'
+        'https://food-i3lz.onrender.com'
     ],
     credentials: true
 }));
