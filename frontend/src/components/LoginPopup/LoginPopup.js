@@ -5,10 +5,8 @@ import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 
 function LoginPopup({ setShowLogin }) {
-  const { setToken } = useContext(StoreContext);
-  
-  // ✅ IMPORTANT: URL ko fix karo
-  const url = process.env.REACT_APP_API_URL || "http://localhost:5000";
+  // ✅ Context se url aur setToken le rahe hain
+  const { url, setToken } = useContext(StoreContext);
   
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
@@ -34,11 +32,12 @@ function LoginPopup({ setShowLogin }) {
       password: data.password?.trim()
     };
     
-    const endpoint = currState === "Login" ? "login" : "register";
-    const apiUrl = `${url}/api/user/${endpoint}`;
-    
     try {
-      console.log("🌐 API URL:", apiUrl); // Ye check karo
+      const endpoint = currState === "Login" ? "login" : "register";
+      const apiUrl = `${url}/api/user/${endpoint}`;
+      
+      console.log("🌐 API URL:", apiUrl);
+      console.log("📤 Data:", cleanData);
       
       const response = await axios.post(apiUrl, cleanData, {
         headers: { 'Content-Type': 'application/json' }
@@ -54,7 +53,30 @@ function LoginPopup({ setShowLogin }) {
       }
     } catch (error) {
       console.error("❌ Error:", error);
-      alert(error.response?.data?.message || "Server error");
+      
+      // User-friendly error messages
+      if (error.response) {
+        switch (error.response.status) {
+          case 400:
+            alert("Please check your input: " + (error.response.data.message || "Invalid data"));
+            break;
+          case 401:
+            alert("Invalid email or password");
+            break;
+          case 404:
+            alert("Server endpoint not found. Please check backend connection.");
+            break;
+          case 500:
+            alert("Server error. Please try again later.");
+            break;
+          default:
+            alert(error.response.data?.message || "Something went wrong!");
+        }
+      } else if (error.request) {
+        alert(`Cannot connect to server. Please check if backend is running at ${url}`);
+      } else {
+        alert("Error: " + error.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -81,8 +103,10 @@ function LoginPopup({ setShowLogin }) {
               type="text"
               placeholder="Your name"
               required
+              autoComplete="name"
             />
           )}
+
           <input
             name="email"
             onChange={onChangeHandler}
@@ -90,7 +114,9 @@ function LoginPopup({ setShowLogin }) {
             type="email"
             placeholder="Your email"
             required
+            autoComplete="email"
           />
+          
           <input
             name="password"
             onChange={onChangeHandler}
@@ -98,16 +124,18 @@ function LoginPopup({ setShowLogin }) {
             type="password"
             placeholder="Password"
             required
+            minLength={6}
+            autoComplete={currState === "Login" ? "current-password" : "new-password"}
           />
         </div>
         
         <button type="submit" disabled={loading}>
-          {loading ? "Please wait..." : (currState === "Sign Up" ? "Create Account" : "Login")}
+          {loading ? "⏳ Please wait..." : (currState === "Sign Up" ? "✨ Create Account" : "🔑 Login")}
         </button>
         
         <div className="login-popup-condition">
-          <input type="checkbox" required />
-          <p>By continuing you agree to the terms of use & privacy policy</p>
+          <input type="checkbox" required id="terms" />
+          <label htmlFor="terms">By continuing you agree to the terms of use & privacy policy</label>
         </div>
         
         {currState === "Login" ? (
