@@ -5,7 +5,10 @@ import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
 
 function LoginPopup({ setShowLogin }) {
-  const { url, setToken } = useContext(StoreContext);
+  const { setToken } = useContext(StoreContext);
+  
+  // ✅ IMPORTANT: URL ko fix karo
+  const url = process.env.REACT_APP_API_URL || "http://localhost:5000";
   
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
@@ -25,76 +28,33 @@ function LoginPopup({ setShowLogin }) {
     event.preventDefault();
     setLoading(true);
     
-    // Clean the data
     const cleanData = {
       name: data.name?.trim(),
       email: data.email?.trim().toLowerCase(),
       password: data.password?.trim()
     };
     
-    // ✅ API URL yahan define karo (try ke bahar)
     const endpoint = currState === "Login" ? "login" : "register";
     const apiUrl = `${url}/api/user/${endpoint}`;
     
     try {
-      console.log("📤 Sending data:", cleanData);
-      console.log("🔗 API URL:", apiUrl);
+      console.log("🌐 API URL:", apiUrl); // Ye check karo
       
-      // Make the request
-      const response = await axios({
-        method: 'post',
-        url: apiUrl,
-        data: cleanData,
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      const response = await axios.post(apiUrl, cleanData, {
+        headers: { 'Content-Type': 'application/json' }
       });
-
-      console.log("✅ Response:", response.data);
 
       if (response.data.success) {
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
-        alert(response.data.message || `${currState} successful!`);
+        alert(`${currState} successful!`);
         setShowLogin(false);
       } else {
-        alert(response.data.message || "Something went wrong!");
+        alert(response.data.message);
       }
     } catch (error) {
-      console.error("❌ Error Details:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        url: apiUrl,  // ✅ Ab ye defined hai
-        method: 'post'
-      });
-
-      // Handle specific errors
-      if (error.response) {
-        switch (error.response.status) {
-          case 400:
-            alert("Bad request: " + (error.response.data.message || "Please check your input"));
-            break;
-          case 401:
-            alert("Unauthorized: Invalid email or password");
-            break;
-          case 404:
-            alert(`API endpoint not found: ${apiUrl}`);
-            break;
-          case 405:
-            alert(`Method not allowed at ${apiUrl}`);
-            break;
-          case 500:
-            alert("Server error. Please try again later");
-            break;
-          default:
-            alert(error.response.data.message || "Something went wrong!");
-        }
-      } else if (error.request) {
-        alert(`Server not responding. Check if backend is running on ${url}`);
-      } else {
-        alert("Error: " + error.message);
-      }
+      console.error("❌ Error:", error);
+      alert(error.response?.data?.message || "Server error");
     } finally {
       setLoading(false);
     }
@@ -121,10 +81,8 @@ function LoginPopup({ setShowLogin }) {
               type="text"
               placeholder="Your name"
               required
-              autoComplete="name"
             />
           )}
-
           <input
             name="email"
             onChange={onChangeHandler}
@@ -132,62 +90,35 @@ function LoginPopup({ setShowLogin }) {
             type="email"
             placeholder="Your email"
             required
-            autoComplete="email"
           />
-          
           <input
             name="password"
             onChange={onChangeHandler}
             value={data.password}
-            minLength={8}
             type="password"
-            placeholder="Password (min 8 characters)"
+            placeholder="Password"
             required
-            autoComplete={currState === "Login" ? "current-password" : "new-password"}
           />
         </div>
         
-        <button 
-          type="submit" 
-          disabled={loading}
-          style={{
-            opacity: loading ? 0.7 : 1,
-            cursor: loading ? 'not-allowed' : 'pointer'
-          }}
-        >
-          {loading ? (
-            <span>⏳ Please wait...</span>
-          ) : (
-            <span>{currState === "Sign Up" ? "✨ Create Account" : "🔑 Login"}</span>
-          )}
+        <button type="submit" disabled={loading}>
+          {loading ? "Please wait..." : (currState === "Sign Up" ? "Create Account" : "Login")}
         </button>
         
         <div className="login-popup-condition">
-          <input type="checkbox" required id="terms" />
-          <label htmlFor="terms">
-            By continuing you agree to the terms of use & privacy policy
-          </label>
+          <input type="checkbox" required />
+          <p>By continuing you agree to the terms of use & privacy policy</p>
         </div>
         
         {currState === "Login" ? (
           <p>
             Create a new account?{" "}
-            <span 
-              onClick={() => setCurrState("Sign Up")}
-              style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
-            >
-              Click here
-            </span>
+            <span onClick={() => setCurrState("Sign Up")}>Click here</span>
           </p>
         ) : (
           <p>
             Already have an account?{" "}
-            <span 
-              onClick={() => setCurrState("Login")}
-              style={{ color: 'blue', cursor: 'pointer', textDecoration: 'underline' }}
-            >
-              Login here
-            </span>
+            <span onClick={() => setCurrState("Login")}>Login here</span>
           </p>
         )}
       </form>
