@@ -23,7 +23,7 @@ app.use(express.json());
 app.use(cors({
     origin: [
         'http://localhost:3000',
-        'https://food-frontend.vercel.app', // आपका Vercel URL
+        'https://food-git-main-i-sahiljakhars-projects.vercel.app/', // आपका Vercel URL
         'https://food-i3lz.onrender.com'
     ],
     credentials: true
