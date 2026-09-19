@@ -1,15 +1,11 @@
-
-
 import React, { useState, useContext } from "react";
 import "./LoginPopup.css";
 import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
-import { useNavigate } from "react-router-dom"; // ✅ Import for navigation
 import axios from "axios";
 
 function LoginPopup({ setShowLogin }) {
   const { url, setToken } = useContext(StoreContext);
-  const navigate = useNavigate(); // ✅ For OTP page navigation
   
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
@@ -17,7 +13,7 @@ function LoginPopup({ setShowLogin }) {
     email: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false); // ✅ Loading state
+  const [loading, setLoading] = useState(false);
 
   const onChangeHandler = (event) => {
     const name = event.target.name;
@@ -29,7 +25,6 @@ function LoginPopup({ setShowLogin }) {
     event.preventDefault();
     setLoading(true);
     
-    // ✅ Trim data before sending
     const cleanData = {
       name: data.name?.trim(),
       email: data.email?.trim().toLowerCase(),
@@ -47,21 +42,11 @@ function LoginPopup({ setShowLogin }) {
       console.log("📥 Response:", response.data);
 
       if (response.data.success) {
-        if (response.data.token) {
-          // ✅ Normal login/register with token
-          setToken(response.data.token);
-          localStorage.setItem("token", response.data.token);
-          alert(response.data.message || `${currState} successful!`);
-          setShowLogin(false);
-        } else if (response.data.requiresOTP) {
-          // ✅ Navigate to OTP verification page
-          setShowLogin(false);
-          navigate('/verify-otp', { 
-            state: { 
-              email: response.data.email || cleanData.email 
-            } 
-          });
-        }
+        // ✅ Direct login/register with token
+        setToken(response.data.token);
+        localStorage.setItem("token", response.data.token);
+        alert(response.data.message || `${currState} successful!`);
+        setShowLogin(false);
       } else {
         alert(response.data.message || "Something went wrong!");
       }
@@ -69,17 +54,7 @@ function LoginPopup({ setShowLogin }) {
       console.error("❌ Full error:", error);
       
       if (error.response) {
-        const errorData = error.response.data;
-        
-        // ✅ Check if OTP verification required
-        if (errorData.requiresOTP) {
-          setShowLogin(false);
-          navigate('/verify-otp', { 
-            state: { email: errorData.email || cleanData.email } 
-          });
-        } else {
-          alert(`Error ${error.response.status}: ${errorData.message || 'Bad Request'}`);
-        }
+        alert(`Error: ${error.response.data.message || 'Bad Request'}`);
       } else if (error.request) {
         alert("No response from server. Check if backend is running on port 5000.");
       } else {

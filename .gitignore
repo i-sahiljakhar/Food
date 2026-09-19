@@ -1,52 +1,13 @@
-# dependencies
 node_modules/
-/.pnp
-.pnp.js
-package-lock.json
-yarn.lock
-
-# environment files
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 
-# build outputs
-dist/
 build/
-out/
+dist/
 
-# uploads - images upload folder
-backend/uploads/*.jpg
-backend/uploads/*.jpeg
-backend/uploads/*.png
-backend/uploads/*.gif
-!backend/uploads/.gitkeep
-
-# logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# IDE
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# backend specific
-backend/node_modules/
-backend/.env
-
-# frontend specific
-frontend/node_modules/
-frontend/build/
-frontend/.env
+npm-debug.log*
+yarn-debug.log*

@@ -10,13 +10,6 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
-// Debug - check if key loaded
-// console.log("🔑 STRIPE_KEY at init:", process.env.STRIPE_SECRET_KEY ? "✅ FOUND" : "❌ MISSING");
-// console.log("🔑 KEY LENGTH:", process.env.STRIPE_SECRET_KEY?.length || 0);
-
-
-
-
 
 
 
