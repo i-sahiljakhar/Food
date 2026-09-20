@@ -24,16 +24,28 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(express.json());
 
+const allowedOrigins = [
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "https://food-theta-lovat.vercel.app"
+];
+
 app.use(
     cors({
-        origin: [
-            "http://localhost:3000",
-            "http://localhost:3001",
-            "https://food-xxxxx.vercel.app"
-        ],
-        credentials: true
+        origin: function (origin, callback) {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"]
     })
 );
+
+app.options("*", cors());
 
 // MongoDB Atlas Connection
 connectDB();
