@@ -45,7 +45,7 @@ app.use(
     })
 );
 
-app.options("*", cors());
+
 
 // MongoDB Atlas Connection
 connectDB();
